@@ -119,7 +119,10 @@ const polylineMachine = createMachine(
                 polyline.points(newPoints);
                 polyline.stroke("black"); // On change la couleur
                 // On sauvegarde la polyline dans la couche de dessin
-                dessin.add(polyline); // On l'ajoute à la couche de dessin
+                const commande = new ConcreteCommand(polyline, dessin)
+                commande.execute()
+              
+                
             },
             addPoint: (context, event) => {
                 const pos = stage.getPointerPosition();
@@ -153,6 +156,8 @@ const polylineMachine = createMachine(
     }
 );
 
+//const undoManager=new UndoManager()
+
 const polylineService = interpret(polylineMachine)
     .onTransition((state) => {
         console.log("Current state:", state.value);
@@ -175,7 +180,7 @@ window.addEventListener("keydown", (event) => {
 // bouton Undo
 const undoButton = document.getElementById("undo");
 undoButton.addEventListener("click", () => {
-    
+    //undoManager.undo()
 });
 
 
@@ -198,5 +203,34 @@ class ConcreteCommand extends Command{
     }
     undo(){
         this.polyline.remove();
+    }
+}
+
+class UndoManager {
+
+    constructor() {
+        this.redoStack = new Stack()
+        this.undoStack = new Stack()
+    }
+
+
+    execute(commande) {
+        commande.execute()
+        this.undoStack.push(commande)
+    }
+
+    undo() {
+            this.element = this.undoStack.pop()
+            this.element.undo()
+            this.redoStack.push(this.element)
+        
+    }
+
+    redo() {
+      
+            this.element = this.redoStack.pop()
+            this.element.execute()
+            this.undoStack.push(this.element)
+        
     }
 }
