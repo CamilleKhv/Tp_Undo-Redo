@@ -177,3 +177,26 @@ const undoButton = document.getElementById("undo");
 undoButton.addEventListener("click", () => {
     
 });
+
+
+class Command{
+    execute() {
+    }
+
+    undo() {
+    }
+}
+
+class ConcreteCommand extends Command{
+    constructor(polyline, dessin) {
+        super();
+        this.polyline = polyline;
+        this.dessin = dessin;
+    }
+    execute(){
+        this.dessin.add(this.polyline);
+    }
+    undo(){
+        this.polyline.remove();
+    }
+}
